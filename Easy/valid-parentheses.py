@@ -8,48 +8,66 @@ Open brackets must be closed in the correct order.
 Every close bracket has a corresponding open bracket of the same type.
 
 """
+
+#to check if string is valid we check if each opening bracket is matched with a closing bracket
+#to check if each opening bracket is matched with a closing bracket, iterate character by character. Reaching the end of the string means string is valid
+#to iterate character by character, we add opening brackets to the queue, and check if closing brackters are valid given the queue
+#to check if closing brackets are valid given the queue, we see if the queue is empty or if the latest bracket is matching
+#to to check if the queue is empty, we check the length
+#to check if the bracket is matching, we see if the valid_pairs[opening_bracket] matches the closing_bracket given 
+#opening_bracket is the lastest bracket in the queue
+
+opening_brackets = ['(',
+                    '[',
+                    '{']
+
+closing_brackets = [')',
+                    ']',
+                    '}']
+
 bracket_pairs = {"(":")",
-                 "[":"]",
-                 "{":"}"}
+                 "{":'}',
+                 "[":']'}
 
-closing_brackets = list(bracket_pairs.values()) 
-opening_brackets = list(bracket_pairs.keys())
-
-def isValid(bracket_string):
-    ordered_opening_brackets, ordered_closing_brackets = separate_brackets(bracket_string)  
-    if not all_brackets_are_paired(ordered_opening_brackets, ordered_closing_brackets):
+def isValid(s):
+    if not all_opening_brackets_match_closing_brackets(s):
         return(False)
-    if not all_pairs_are_valid(ordered_opening_brackets, ordered_closing_brackets):
-        return(False)
-    return(True)
-
-def separate_brackets(bracket_string):
-    ordered_opening_brackets = []
-    ordered_closing_brackets = []
-    for bracket in bracket_string:
-        if bracket in opening_brackets:
-            ordered_opening_brackets.append(bracket)
-        else:
-            ordered_closing_brackets.append(bracket)
-    ordered_closing_brackets = reverse_list(ordered_closing_brackets)
-    return(ordered_opening_brackets, ordered_closing_brackets)
-
-def all_brackets_are_paired(opening, closing):
-    result = len(opening) == len(closing)
-    return(result)
-
-def all_pairs_are_valid(opening, closing):
-    for index in range(len(opening)): 
-        if not is_valid_bracket_pair(opening.pop(), closing.pop()):
-            return(False)
-    return(True)
-
-def is_valid_bracket_pair(open_bracket, close_bracket):
-    if bracket_pairs[open_bracket] == close_bracket:
+    else:
         return(True)
-    return(False)
+    
+def all_opening_brackets_match_closing_brackets(bracket_string):
+    bracket_stack = []
+    for bracket in bracket_string:
+        if bracket_is_opening_bracket(bracket):
+            bracket_stack.append(bracket)
+        elif bracket_is_closing_bracket(bracket):
+            if stack_is_empty(bracket_stack):
+                return(False)
+            previous_open_bracket = get_previous_open_bracket(bracket_stack)  
+            if not bracket_closes_previous_open_bracket(bracket, previous_open_bracket):
+                return(False)
+    if not stack_is_empty(bracket_stack):
+        return(False)
+    return(True)
 
-def reverse_list(list_to_reverse):
-    reversed_list = list(reversed(list_to_reverse))
-    return(reversed_list)
-print(isValid("([)]"))
+def bracket_closes_previous_open_bracket(closed_bracket, previous_open_bracket):
+    return(bracket_pairs[previous_open_bracket] == closed_bracket)
+
+def bracket_is_opening_bracket(bracket):
+    return(bracket in opening_brackets)
+
+def bracket_is_closing_bracket(bracket):
+    return(bracket in closing_brackets)
+def get_previous_open_bracket(bracket_stack):
+    return(bracket_stack.pop())
+    
+def stack_is_empty(stack):
+    return(not bool(stack))
+
+print(isValid('()'))
+print(isValid('(]'))
+print(isValid('([)]'))
+print(isValid(')'))
+print(isValid('(['))
+print(isValid('([})()])'))
+
