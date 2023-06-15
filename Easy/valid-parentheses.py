@@ -64,10 +64,4 @@ def get_previous_open_bracket(bracket_stack):
 def stack_is_empty(stack):
     return(not bool(stack))
 
-print(isValid('()'))
-print(isValid('(]'))
-print(isValid('([)]'))
-print(isValid(')'))
-print(isValid('(['))
-print(isValid('([})()])'))
 
