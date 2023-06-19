@@ -15,46 +15,44 @@ from collections import defaultdict
 def floodfill(image, sr, sc, color):
     visited = defaultdict(bool)
     origional_color = image[sr][sc]
-    pixels_to_recolor = []
-    image = BFS_fill(image, sr, sc, color, visited, origional_color)
+    image = BFS_fill(image, (sr, sc), color, visited, origional_color)
     return(image)
 
 
-def BFS_fill(image, i, j, new_color, visited, origional_color):
-    
-    print(f'visiting {i}, {j}')
-    if i == 0 and j == 1 :
-        pass
-    if visited[(i,j)]:
-        print(f"alreadt visited {i},{j}")
-        return(None)
-    if not 0 <= i <= len(image)-1:
-        print('invalid i')
-        return(None)
-    elif not  0 <= j <= len(image[0])-1:
-        print('invalid j')
-        return(None)
-    elif image[i][j] != origional_color:
-        print('color does not match')
+def BFS_fill(image, pixel, new_color, visited, origional_color):
+    i, j = pixel
+    if not pixel_is_valid(pixel, visited, image, origional_color):
         return(None)
     else:
-        visited[i,j] = True
-        print('fill criteria met')
+        visited[pixel] = True
         image[i][j] = new_color
-        BFS_fill(image, i-1, j, new_color, visited, origional_color)
-        BFS_fill(image, i+1, j, new_color, visited, origional_color)
-        BFS_fill(image, i, j-1, new_color, visited, origional_color)
-        BFS_fill(image, i, j+1, new_color, visited, origional_color)
+        neighbors = get_adjacent_pixels(i,j)
+        for adjacent_pixel in neighbors:
+            BFS_fill(image, adjacent_pixel, new_color, visited, origional_color)
     return(image)
-    
-    
-image = [[1,1,1],[1,1,0],[1,0,1]]
-expected = [[2,2,2],[2,2,0],[2,0,1]]
-sr = 1
-sc = 1
-color = 2
 
-test = floodfill(image, sr, sc, color)
+def pixel_is_valid(pixel, visited, image, origional_color):
+    if pixel_visited(pixel, visited) or pixel_outside_of_image(pixel, image) or pixel_does_not_match_origional_color(pixel, image, origional_color):
+           return(False)
+    else:
+        return(True)
+    
+def pixel_visited(pixel, visited):
+    return(visited[pixel])
 
-visited = [[False] * len(image)] * len(image[sr])
-print(test == expected)
+def pixel_outside_of_image(pixel, image):
+    image_height = len(image)
+    image_width = len(image[0]) 
+    i,j = pixel
+    if 0 <= i < image_height and 0 <= j < image_width:
+        return(False)
+    else:
+        return(True)
+
+def pixel_does_not_match_origional_color(pixel, image, origional_color):
+    i,j = pixel
+    return(image[i][j] != origional_color)
+
+def get_adjacent_pixels(i,j): 
+    adjacent_pixels = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)] 
+    return(adjacent_pixels)
